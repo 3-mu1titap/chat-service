@@ -1,0 +1,52 @@
+#version: '3.8'
+services:
+  mongoPrimary:
+    image: mongo:latest
+    hostname: mongoPrimary
+    container_name: mongoPrimary
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/primary:/data/db
+    command:
+      - '--replSet'
+      - 'rs0'
+      - '--bind_ip_all'
+
+  mongoSecondary1:
+    image: mongo:latest
+    hostname: mongoSecondary1
+    container_name: mongoSecondary1
+    restart: unless-stopped
+    depends_on:
+      - mongoPrimary
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/secondary1:/data/db
+    command:
+      - '--replSet'
+      - 'rs0'
+      - '--bind_ip_all'
+
+  mongoSecondary2:
+    image: mongo:latest
+    hostname: mongoSecondary2
+    container_name: mongoSecondary2
+    restart: unless-stopped
+    depends_on:
+      - mongoPrimary
+      - mongoSecondary1
+    ports:
+      - 27019:27017
+    volumes:
+      - ./data/secondary2:/data/db
+    command:
+      - '--replSet'
+      - 'rs0'
+      - '--bind_ip_all'
+
+networks:
+  default:
+    name: mongodb-Cluster
