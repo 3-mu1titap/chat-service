@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 public interface ChatService {
 
     void createChat(CreateChatRequestDto createChatRequestDto);
+    void softDeleteChat(String id);
 }
