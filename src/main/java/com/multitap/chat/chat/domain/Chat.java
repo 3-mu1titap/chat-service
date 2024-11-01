@@ -14,36 +14,38 @@ import static com.multitap.chat.chat.domain.MessageType.*;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Document(collection = "chat")
 public class Chat {
 
     @Id
     private String id;
-//    @NotNull
+    @NotNull
     private String mentoringSessionUuid;
-//    @NotNull
+    @NotNull
     private String memberUuid;
-//    @NotNull
+    @NotNull
     private String message;
-//    @NotNull
+    @NotNull
     private boolean isDeleted;
-//    @NotNull
-//    private MessageType messageType;
+    @NotNull
+    private MessageType messageType;
     private String mediaUrl;
 
     @Builder
-    public Chat(String mentoringSessionUuid,
+    public Chat(String id,
+                String mentoringSessionUuid,
                 String memberUuid,
                 String message,
                 boolean isDeleted,
                 MessageType messageType,
                 String mediaUrl) {
+        this.id = id;
         this.mentoringSessionUuid = mentoringSessionUuid;
         this.memberUuid = memberUuid;
         this.message = message;
         this.isDeleted = isDeleted;
-//        this.messageType = messageType;
+        this.messageType = messageType;
         this.mediaUrl = mediaUrl;
     }
 }
