@@ -14,7 +14,6 @@ import static com.multitap.chat.chat.domain.MessageType.*;
 
 @Getter
 @NoArgsConstructor
-//@AllArgsConstructor
 @Document(collection = "chat")
 public class Chat {
 
