@@ -40,3 +40,4 @@ application.yml
 
 ## mongo data
 ./data
+/data
