@@ -10,12 +10,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
+
 import static com.multitap.chat.chat.domain.MessageType.*;
 
 @Getter
 @NoArgsConstructor
 @Document(collection = "chat")
-public class Chat {
+public class Chat extends BaseEntity {
 
     @Id
     private String id;
