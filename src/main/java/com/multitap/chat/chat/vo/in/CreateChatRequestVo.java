@@ -8,7 +8,6 @@ import lombok.ToString;
 @ToString
 public class CreateChatRequestVo {
     private String mentoringSessionUuid;
-    private String memberUuid;
     private String message;
     private MessageType messageType;
     private String mediaUrl;

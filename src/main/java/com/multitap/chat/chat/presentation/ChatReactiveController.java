@@ -25,15 +25,19 @@ public class ChatReactiveController {
     private final ChatService chatService;
 
     @PostMapping
-    public BaseResponse<Void> createChat(@RequestBody CreateChatRequestVo createChatRequestVo) {
+    public BaseResponse<Void> createChat(
+            @RequestHeader ("Uuid") String memberUuid,
+            @RequestBody CreateChatRequestVo createChatRequestVo) {
         log.info("createChatRequestVo: {}", createChatRequestVo);
-        CreateChatRequestDto createChatRequestDto = CreateChatRequestDto.from(createChatRequestVo);
+        CreateChatRequestDto createChatRequestDto = CreateChatRequestDto.from(createChatRequestVo, memberUuid);
         chatService.createChat(createChatRequestDto);
         return new BaseResponse<>();
     }
 
     @PutMapping("/{id}/delete")
-    public BaseResponse<Void> softDeleteChat(@PathVariable String id) {
+    public BaseResponse<Void> softDeleteChat(
+            @RequestHeader ("Uuid") String memberUuid,
+            @PathVariable String id) {
         log.info("deleteChat: {}", id);
         chatService.softDeleteChat(id);
         return new BaseResponse<>();
