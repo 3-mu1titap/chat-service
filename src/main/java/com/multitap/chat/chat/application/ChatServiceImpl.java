@@ -5,6 +5,7 @@ import com.multitap.chat.chat.dto.in.SoftDeleteChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import com.multitap.chat.chat.infrastructure.ChatRepository;
 import com.multitap.chat.chat.infrastructure.ReactiveChatRepository;
+import com.multitap.chat.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.multitap.chat.common.response.BaseResponseStatus.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,9 +35,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void softDeleteChat(String id) {
+    public void softDeleteChat(String id, String memberUuid) {
         log.info("Delete chat: {}", id);
-        reactiveChatRepository.findById(id).flatMap(chat -> reactiveChatRepository.save(
+        reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
+                .switchIfEmpty(Mono.error(new BaseException(NO_DELETE_CHAT_AUTHORITY)))
+                .flatMap(chat -> reactiveChatRepository.save(
                 SoftDeleteChatRequestDto.builder()
                         .id(chat.getId())
                         .mentoringSessionUuid(chat.getMentoringSessionUuid())

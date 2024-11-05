@@ -11,7 +11,7 @@ import java.util.List;
 public interface ChatService {
 
     void createChat(CreateChatRequestDto createChatRequestDto);
-    void softDeleteChat(String id);
+    void softDeleteChat(String id, String memberUuid);
     Flux<ChatResponseDto> getChatByMentoringSessionUuid(String mentoringSessionUuid);
     List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber);
 }
