@@ -5,6 +5,8 @@ import com.multitap.chat.chat.vo.out.ChatResponseVo;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class ChatResponseDto {
@@ -16,6 +18,7 @@ public class ChatResponseDto {
     private boolean isDeleted;
     private MessageType messageType;
     private String mediaUrl;
+    private LocalDateTime createdAt;
 
     public ChatResponseVo toResponseVo() {
         return ChatResponseVo.builder()
@@ -26,6 +29,7 @@ public class ChatResponseDto {
                 .isDeleted(isDeleted)
                 .messageType(messageType)
                 .mediaUrl(mediaUrl)
+                .createdAt(createdAt)
                 .build();
     }
 }
