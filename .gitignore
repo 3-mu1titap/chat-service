@@ -36,3 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 application.yml
+
+
+## mongo data
+./data
+/data
