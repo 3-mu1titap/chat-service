@@ -39,7 +39,7 @@ public class ChatReactiveController {
             @RequestHeader ("Uuid") String memberUuid,
             @PathVariable String id) {
         log.info("deleteChat: {}", id);
-        chatService.softDeleteChat(id);
+        chatService.softDeleteChat(id, memberUuid);
         return new BaseResponse<>();
     }
 
