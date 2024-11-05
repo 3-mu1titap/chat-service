@@ -1,6 +1,0 @@
-cd
-db.chat.find();
-db.chat.findAll();
-show collections;
-use chat
-show dbs;
