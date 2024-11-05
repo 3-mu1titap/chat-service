@@ -29,10 +29,10 @@ public class CreateChatRequestDto {
                 .build();
     }
 
-    public static CreateChatRequestDto from(CreateChatRequestVo createChatRequestVo) {
+    public static CreateChatRequestDto from(CreateChatRequestVo createChatRequestVo, String memberUuid) {
         return CreateChatRequestDto.builder()
                 .mentoringSessionUuid(createChatRequestVo.getMentoringSessionUuid())
-                .memberUuid(createChatRequestVo.getMemberUuid())
+                .memberUuid(memberUuid)
                 .message(createChatRequestVo.getMessage())
                 .messageType(createChatRequestVo.getMessageType())
                 .mediaUrl(createChatRequestVo.getMediaUrl())
