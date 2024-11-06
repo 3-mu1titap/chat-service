@@ -3,48 +3,57 @@ package com.multitap.chat.common.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.multitap.chat.common.response.BaseResponse;
 import com.multitap.chat.common.response.BaseResponseStatus;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebExceptionHandler;
+import reactor.core.publisher.Mono;
 
-import javax.security.sasl.AuthenticationException;
-import java.io.IOException;
+import javax.naming.AuthenticationException;
 
 @Slf4j
 @Component
-public class BaseExceptionHandlerFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class BaseExceptionHandlerFilter implements WebExceptionHandler {
+
+    private final ObjectMapper objectMapper;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        try {
-            filterChain.doFilter(request, response);
-        } catch (BaseException e) {
-            log.error("BaseException -> {}({})", e.getStatus(), e.getStatus().getMessage(), e);
-            setErrorResponse(response, e);
-        } catch (AuthenticationException e) {
-            log.error("AuthenticationException -> {}", e.getMessage(), e);
-            setErrorResponse(response, new BaseException(BaseResponseStatus.NO_SIGN_IN));
+    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+        if (ex instanceof BaseException baseException) {
+            return handleBaseException(exchange, baseException);
+        } else if (ex instanceof AuthenticationException) {
+            return handleAuthenticationException(exchange);
         }
+        return Mono.error(ex); // 다른 예외는 그대로 전달
     }
 
+    private Mono<Void> handleBaseException(ServerWebExchange exchange, BaseException ex) {
+        log.error("BaseException -> {}({})", ex.getStatus(), ex.getStatus().getMessage(), ex);
+        return setErrorResponse(exchange, ex.getStatus(), HttpStatus.UNAUTHORIZED);
+    }
 
-    private void setErrorResponse(HttpServletResponse response,
-                                  BaseException be) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        BaseResponse<BaseResponseStatus> baseResponse = new BaseResponse<>(be.getStatus());
+    private Mono<Void> handleAuthenticationException(ServerWebExchange exchange) {
+        log.error("AuthenticationException -> No sign-in authority");
+        return setErrorResponse(exchange, BaseResponseStatus.NO_SIGN_IN, HttpStatus.UNAUTHORIZED);
+    }
+
+    private Mono<Void> setErrorResponse(ServerWebExchange exchange, BaseResponseStatus status, HttpStatus httpStatus) {
         try {
-            response.getWriter().write(objectMapper.writeValueAsString(baseResponse));
-        } catch (IOException e) {
-            e.printStackTrace();
+            BaseResponse<BaseResponseStatus> baseResponse = new BaseResponse<>(status);
+            byte[] responseBytes = objectMapper.writeValueAsBytes(baseResponse);
+
+            exchange.getResponse().setStatusCode(httpStatus);
+            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(responseBytes);
+            return exchange.getResponse().writeWith(Mono.just(buffer));
+        } catch (Exception e) {
+            return Mono.error(e);
         }
     }
 }
