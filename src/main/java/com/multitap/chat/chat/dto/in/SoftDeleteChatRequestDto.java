@@ -19,15 +19,27 @@ public class SoftDeleteChatRequestDto {
     private MessageType messageType;
     private String mediaUrl;
 
-    public Chat toChat() {
+    public Chat softDeleteChat() {
         return Chat.builder()
                 .id(id)
                 .mentoringSessionUuid(mentoringSessionUuid)
                 .memberUuid(memberUuid)
                 .message(message)
-                .isDeleted(isDeleted)
+                .isDeleted(true)
                 .messageType(messageType)
                 .mediaUrl(mediaUrl)
+                .build();
+    }
+
+    public static SoftDeleteChatRequestDto from(Chat chat) {
+        return SoftDeleteChatRequestDto.builder()
+                .id(chat.getId())
+                .mentoringSessionUuid(chat.getMentoringSessionUuid())
+                .memberUuid(chat.getMemberUuid())
+                .message(chat.getMessage())
+                .isDeleted(chat.isDeleted())
+                .messageType(chat.getMessageType())
+                .mediaUrl(chat.getMediaUrl())
                 .build();
     }
 }
