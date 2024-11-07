@@ -47,17 +47,7 @@ public class ChatReactiveController {
     public Flux<ChatResponseVo> getChatByMentoringSessionUuid(@PathVariable String mentoringSessionUuid) {
         log.info("getChatByMentoringSessionUuid: {}", mentoringSessionUuid);
         return chatService.getChatByMentoringSessionUuid(mentoringSessionUuid).subscribeOn(Schedulers.boundedElastic())
-                .map(chatResponseDto ->
-                    ChatResponseVo.builder()
-                            .id(chatResponseDto.getId())
-                            .mentoringSessionUuid(chatResponseDto.getMentoringSessionUuid())
-                            .memberUuid(chatResponseDto.getMemberUuid())
-                            .message(chatResponseDto.getMessage())
-                            .messageType(chatResponseDto.getMessageType())
-                            .mediaUrl(chatResponseDto.getMediaUrl())
-                            .isDeleted(chatResponseDto.isDeleted())
-                            .build()
-                );
+                .map(ChatResponseVo::from);
     }
 
     @GetMapping("/paging/{mentoringSessionUuid}")

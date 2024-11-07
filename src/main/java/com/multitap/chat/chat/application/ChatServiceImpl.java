@@ -40,31 +40,15 @@ public class ChatServiceImpl implements ChatService {
         reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
                 .switchIfEmpty(Mono.error(new BaseException(NO_DELETE_CHAT_AUTHORITY)))
                 .flatMap(chat -> reactiveChatRepository.save(
-                SoftDeleteChatRequestDto.builder()
-                        .id(chat.getId())
-                        .mentoringSessionUuid(chat.getMentoringSessionUuid())
-                        .memberUuid(chat.getMemberUuid())
-                        .message(chat.getMessage())
-                        .messageType(chat.getMessageType())
-                        .mediaUrl(chat.getMediaUrl())
-                        .isDeleted(true)
-                        .build().toChat())).subscribe();
+                    SoftDeleteChatRequestDto.from(chat).softDeleteChat()
+                        )).subscribe();
     }
 
     @Override
     public Flux<ChatResponseDto> getChatByMentoringSessionUuid(String mentoringSessionUuid) {
         log.info("Get chat by mentoring session uuid: {}", mentoringSessionUuid);
         return reactiveChatRepository.findChatByMentoringSessionUuid(mentoringSessionUuid)
-                .map(chat -> ChatResponseDto.builder()
-                        .id(chat.getId())
-                        .mentoringSessionUuid(chat.getMentoringSessionUuid())
-                        .memberUuid(chat.getMemberUuid())
-                        .message(chat.getMessage())
-                        .messageType(chat.getMessageType())
-                        .mediaUrl(chat.getMediaUrl())
-                        .isDeleted(chat.isDeleted())
-                        .createdAt(chat.getCreatedAt())
-                        .build());
+                .map(ChatResponseDto::from);
     }
 
     @Override
@@ -75,16 +59,7 @@ public class ChatServiceImpl implements ChatService {
 
         return chatRepository.findByMentoringSessionUuidAndCreatedAtLessThan(mentoringSessionUuid, date, pageable)
                 .stream()
-                .map(chat -> ChatResponseDto.builder()
-                        .id(chat.getId())
-                        .mentoringSessionUuid(chat.getMentoringSessionUuid())
-                        .memberUuid(chat.getMemberUuid())
-                        .message(chat.getMessage())
-                        .messageType(chat.getMessageType())
-                        .mediaUrl(chat.getMediaUrl())
-                        .isDeleted(chat.isDeleted())
-                        .createdAt(chat.getCreatedAt())
-                        .build())
+                .map(ChatResponseDto::from)
                 .toList();
     }
 }
