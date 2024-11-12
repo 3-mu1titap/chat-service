@@ -2,15 +2,16 @@ package com.multitap.chat.chat.dto.out;
 
 import com.multitap.chat.chat.domain.Chat;
 import com.multitap.chat.chat.domain.MessageType;
-import com.multitap.chat.chat.dto.in.SoftDeleteChatRequestDto;
 import com.multitap.chat.chat.vo.out.ChatResponseVo;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@Slf4j
 public class ChatResponseDto {
 
     private String id;
@@ -36,6 +37,8 @@ public class ChatResponseDto {
     }
 
     public static ChatResponseDto from(Chat chat) {
+        log.info(chat.toString());
+
         return ChatResponseDto.builder()
                 .id(chat.getId())
                 .mentoringSessionUuid(chat.getMentoringSessionUuid())
@@ -44,6 +47,7 @@ public class ChatResponseDto {
                 .isDeleted(chat.isDeleted())
                 .messageType(chat.getMessageType())
                 .mediaUrl(chat.getMediaUrl())
+                .createdAt(chat.getCreatedAt())
                 .build();
     }
 }
