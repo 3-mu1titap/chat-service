@@ -1,9 +1,7 @@
 package com.multitap.chat.chat.vo.out;
 
 import com.multitap.chat.chat.domain.MessageType;
-import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
-import com.multitap.chat.chat.vo.in.CreateChatRequestVo;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,6 +29,8 @@ public class ChatResponseVo {
                 .message(chatResponseDto.getMessage())
                 .messageType(chatResponseDto.getMessageType())
                 .mediaUrl(chatResponseDto.getMediaUrl())
+                .createdAt(chatResponseDto.getCreatedAt())
+                .isDeleted(chatResponseDto.isDeleted())
                 .build();
     }
 }

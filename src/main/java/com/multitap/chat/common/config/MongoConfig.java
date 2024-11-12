@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;
 
 @Configuration
-@EnableReactiveMongoAuditing
+//@EnableReactiveMongoAuditing
 public class MongoConfig {
 }

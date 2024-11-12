@@ -2,21 +2,14 @@ package com.multitap.chat.chat.domain;
 
 import com.multitap.chat.common.response.BaseEntity;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.time.LocalDateTime;
-
-import static com.multitap.chat.chat.domain.MessageType.*;
 
 @Getter
 @NoArgsConstructor
 @Document(collection = "chat")
+@ToString
 public class Chat extends BaseEntity {
 
     @Id
