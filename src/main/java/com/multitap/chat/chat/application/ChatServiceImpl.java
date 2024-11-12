@@ -75,7 +75,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Flux<ChatResponseDto> getChatByMentoringSessionUuidV2(String mentoringSessionUuid) {
+    public Flux<ChatResponseDto> getRealTimeChatByMentoringSessionUuid(String mentoringSessionUuid) {
         // ChangeStreamOptions 설정
         ChangeStreamOptions options = ChangeStreamOptions.builder()
                 .filter(Aggregation.newAggregation( Aggregation.match(Criteria.where("fullDocument.mentoringSessionUuid").is(mentoringSessionUuid)))) // 특정 채팅방의 메시지만 필터링

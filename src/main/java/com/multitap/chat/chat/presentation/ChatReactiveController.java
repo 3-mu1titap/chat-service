@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ChatReactiveController {
         return new BaseResponse<>();
     }
 
-    @PutMapping("/{id}/delete")
+    @PutMapping("/softDelete/{id}")
     public BaseResponse<Void> softDeleteChat(
             @RequestHeader ("Uuid") String memberUuid,
             @PathVariable String id) {
@@ -43,14 +42,14 @@ public class ChatReactiveController {
         return new BaseResponse<>();
     }
 
-    @GetMapping(value = "/{mentoringSessionUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ChatResponseVo> getChatByMentoringSessionUuid(@PathVariable String mentoringSessionUuid) {
-        log.info("getChatByMentoringSessionUuid: {}", mentoringSessionUuid);
-        return chatService.getChatByMentoringSessionUuid(mentoringSessionUuid).subscribeOn(Schedulers.boundedElastic())
-                .map(ChatResponseVo::from);
-    }
+//    @GetMapping(value = "/{mentoringSessionUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public Flux<ChatResponseVo> getChatByMentoringSessionUuid(@PathVariable String mentoringSessionUuid) {
+//        log.info("getChatByMentoringSessionUuid: {}", mentoringSessionUuid);
+//        return chatService.getChatByMentoringSessionUuid(mentoringSessionUuid).subscribeOn(Schedulers.boundedElastic())
+//                .map(ChatResponseVo::from);
+//    }
 
-    @GetMapping("/paging/{mentoringSessionUuid}")
+    @GetMapping("/pagingSearch/{mentoringSessionUuid}")
     public List<ChatResponseVo> getChatsByMentoringSessionUuid(
             @PathVariable String mentoringSessionUuid,
             @RequestParam(required = false) LocalDateTime cursorTimestamp, // 마지막 메시지의 createdAt
@@ -63,9 +62,9 @@ public class ChatReactiveController {
                 .toList();
     }
 
-    @GetMapping(value = "/new/{mentoringSessionUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ChatResponseVo> getNewChatMessageByRoomId(@PathVariable String mentoringSessionUuid) {
-        return chatService.getChatByMentoringSessionUuidV2(mentoringSessionUuid)
+    @GetMapping(value = "/real-time/{mentoringSessionUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ChatResponseVo> getRealTimeChatMessageByMentoringSessionUuid(@PathVariable String mentoringSessionUuid) {
+        return chatService.getRealTimeChatByMentoringSessionUuid(mentoringSessionUuid)
                 .map(ChatResponseVo::from);
     }
 }

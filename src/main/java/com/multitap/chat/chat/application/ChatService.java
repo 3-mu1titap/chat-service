@@ -13,5 +13,5 @@ public interface ChatService {
     void softDeleteChat(String id, String memberUuid);
     Flux<ChatResponseDto> getChatByMentoringSessionUuid(String mentoringSessionUuid);
     List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber);
-    Flux<ChatResponseDto> getChatByMentoringSessionUuidV2(String mentoringSessionUuid);
+    Flux<ChatResponseDto> getRealTimeChatByMentoringSessionUuid(String mentoringSessionUuid);
 }
