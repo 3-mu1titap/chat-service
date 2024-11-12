@@ -58,8 +58,8 @@ jobs:
       # Docker 이미지 Build
       - name: docker image build & docker Hub push
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/category-service .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/category-service
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-service .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-service
 
   deploy:
     runs-on: ubuntu-latest
