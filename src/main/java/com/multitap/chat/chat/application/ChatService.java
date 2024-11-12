@@ -1,6 +1,5 @@
 package com.multitap.chat.chat.application;
 
-import com.multitap.chat.chat.domain.Chat;
 import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import reactor.core.publisher.Flux;
@@ -14,4 +13,5 @@ public interface ChatService {
     void softDeleteChat(String id, String memberUuid);
     Flux<ChatResponseDto> getChatByMentoringSessionUuid(String mentoringSessionUuid);
     List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber);
+    Flux<ChatResponseDto> getChatByMentoringSessionUuidV2(String mentoringSessionUuid);
 }

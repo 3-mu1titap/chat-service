@@ -62,4 +62,10 @@ public class ChatReactiveController {
                 .map(ChatResponseDto::toResponseVo)
                 .toList();
     }
+
+    @GetMapping(value = "/new/{mentoringSessionUuid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ChatResponseVo> getNewChatMessageByRoomId(@PathVariable String mentoringSessionUuid) {
+        return chatService.getChatByMentoringSessionUuidV2(mentoringSessionUuid)
+                .map(ChatResponseVo::from);
+    }
 }

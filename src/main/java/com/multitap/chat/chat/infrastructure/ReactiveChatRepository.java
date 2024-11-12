@@ -16,4 +16,5 @@ public interface ReactiveChatRepository extends ReactiveMongoRepository<Chat, St
     Flux<Chat> findChatByMentoringSessionUuid(String mentoringSessionUuid);
 
     Mono<Chat> findChatByIdAndMemberUuid(String id, String memberUuid);
+
 }
