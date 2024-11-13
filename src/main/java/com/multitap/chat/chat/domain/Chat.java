@@ -21,6 +21,7 @@ public class Chat extends BaseEntity {
     @NotNull
     private String message;
     @NotNull
+//    @Setter
     private boolean isDeleted;
     @NotNull
     private MessageType messageType;
@@ -41,5 +42,9 @@ public class Chat extends BaseEntity {
         this.isDeleted = isDeleted;
         this.messageType = messageType;
         this.mediaUrl = mediaUrl;
+    }
+
+    public void softDelete(@NotNull boolean deleted) {
+        isDeleted = deleted;
     }
 }

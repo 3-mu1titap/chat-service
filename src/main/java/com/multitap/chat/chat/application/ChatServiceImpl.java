@@ -1,5 +1,6 @@
 package com.multitap.chat.chat.application;
 
+import com.multitap.chat.chat.domain.Chat;
 import com.multitap.chat.chat.domain.MessageType;
 import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
 import com.multitap.chat.chat.dto.in.SoftDeleteChatRequestDto;
@@ -50,9 +51,10 @@ public class ChatServiceImpl implements ChatService {
         log.info("Delete chat: {}", id);
         reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
                 .switchIfEmpty(Mono.error(new BaseException(NO_DELETE_CHAT_AUTHORITY)))
-                .flatMap(chat -> reactiveChatRepository.save(
-                    SoftDeleteChatRequestDto.from(chat).softDeleteChat()
-                        )).subscribe();
+                .flatMap(chat -> {
+                    chat.softDelete(true);
+                    return reactiveChatRepository.save(chat);
+                }).subscribe();
     }
 
     @Override
