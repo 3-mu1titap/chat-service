@@ -31,6 +31,7 @@ public class SoftDeleteChatRequestDto {
                 .build();
     }
 
+
     public static SoftDeleteChatRequestDto from(Chat chat) {
         return SoftDeleteChatRequestDto.builder()
                 .id(chat.getId())
