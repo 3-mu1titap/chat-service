@@ -103,10 +103,11 @@ public class ChatServiceImpl implements ChatService {
                     // isDeleted가 true인 경우 "삭제된 메시지입니다."로 메시지 내용 설정
                     String message = document.getBoolean("isDeleted") ? "삭제된 메시지입니다." : document.getString("message");
 
-                    Date createdAtDate = document.getDate("createdAt");
+                    Date createdAtDate = document.get("created_at", Date.class);
                     LocalDateTime createdAt = createdAtDate != null
                             ? LocalDateTime.ofInstant(createdAtDate.toInstant(), ZoneId.systemDefault())
                             : null;
+                    log.info("createdAt = {}", createdAt);
 
                     return ChatResponseDto.builder()
                             .id(document.get("_id", ObjectId.class).toString())
