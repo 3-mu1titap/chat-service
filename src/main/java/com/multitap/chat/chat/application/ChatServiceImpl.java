@@ -42,7 +42,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void createChat(CreateChatRequestDto createChatRequestDto) {
-        log.info("Create chat request: {}", createChatRequestDto);
+        log.info("Create chat request: {}", createChatRequestDto.toChat());
         reactiveChatRepository.save(createChatRequestDto.toChat()).subscribe();
     }
 

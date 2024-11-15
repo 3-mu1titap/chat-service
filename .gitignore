@@ -44,5 +44,5 @@ application.yml
 
 #src/main/resources/application.yml
 
-#**/SwaggerConfig.class
-#**/SwaggerConfig.java
+**/SwaggerConfig.class
+**/SwaggerConfig.java
