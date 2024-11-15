@@ -39,6 +39,21 @@ public class CreateChatRequestDto {
                 .build();
     }
 
+    public static CreateChatRequestDto of(
+            String mentoringSessionUuid,
+            String memberUuid,
+            String message,
+            MessageType messageType,
+            String mediaUrl) {
+        return CreateChatRequestDto.builder()
+                .mentoringSessionUuid(mentoringSessionUuid)
+                .memberUuid(memberUuid)
+                .message(message)
+                .messageType(messageType)
+                .mediaUrl(mediaUrl)
+                .build();
+    }
+
     @Builder
     public CreateChatRequestDto(String mentoringSessionUuid, String memberUuid, String message, MessageType messageType, String mediaUrl) {
         this.mentoringSessionUuid = mentoringSessionUuid;
