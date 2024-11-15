@@ -30,7 +30,6 @@ public class SwaggerConfig {
                 .components(components)
                 .addServersItem(new Server().url("/chat-service")) // 배포 버전
 //                .addServersItem(new Server().url("/")) // 로컬 버전
-                .addServersItem(new Server().url("/"))
                 .info(apiInfo());
     }
 
