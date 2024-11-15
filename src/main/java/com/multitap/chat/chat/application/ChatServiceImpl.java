@@ -1,9 +1,7 @@
 package com.multitap.chat.chat.application;
 
-import com.multitap.chat.chat.domain.Chat;
 import com.multitap.chat.chat.domain.MessageType;
 import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
-import com.multitap.chat.chat.dto.in.SoftDeleteChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import com.multitap.chat.chat.infrastructure.ChatRepository;
 import com.multitap.chat.chat.infrastructure.ReactiveChatRepository;
@@ -24,11 +22,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.bson.Document;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
+import static com.multitap.chat.chat.domain.MessageType.NOTICE;
 import static com.multitap.chat.common.response.BaseResponseStatus.*;
 
 @Slf4j
@@ -41,20 +41,20 @@ public class ChatServiceImpl implements ChatService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Override
-    public void createChat(CreateChatRequestDto createChatRequestDto) {
-        log.info("Create chat request: {}", createChatRequestDto.toChat());
-        reactiveChatRepository.save(createChatRequestDto.toChat()).subscribe();
+    public Mono<Void> createChat(CreateChatRequestDto createChatRequestDto) {
+        log.info("Create chat request: {}", createChatRequestDto);
+        return reactiveChatRepository.save(createChatRequestDto.toChat()).then();
     }
 
     @Override
-    public void softDeleteChat(String id, String memberUuid) {
+    public Mono<Void> softDeleteChat(String id, String memberUuid) {
         log.info("Delete chat: {}", id);
-        reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
+        return reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
                 .switchIfEmpty(Mono.error(new BaseException(NO_DELETE_CHAT_AUTHORITY)))
                 .flatMap(chat -> {
                     chat.softDelete(true);
                     return reactiveChatRepository.save(chat);
-                }).subscribe();
+                }).then();
     }
 
     @Override
@@ -120,6 +120,15 @@ public class ChatServiceImpl implements ChatService {
                             .createdAt(createdAt)
                             .build();
                 });
+    }
+
+    @Override
+    public Mono<Void> handleUserJoin(String memberUuid, String nickName, String mentoringSessionUuid) {
+        String message = nickName + "님이 채팅방에 입장하셨습니다.";
+
+        return reactiveChatRepository.save(CreateChatRequestDto
+                .of(mentoringSessionUuid, memberUuid, message, NOTICE, null).toChat())
+                .then();
     }
 
 }
