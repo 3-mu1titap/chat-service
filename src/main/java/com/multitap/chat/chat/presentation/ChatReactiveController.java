@@ -23,7 +23,7 @@ public class ChatReactiveController {
 
     @PostMapping
     public Mono<Void> createChat(
-            @RequestHeader ("Uuid") String memberUuid,
+            @RequestHeader ("userUuid") String memberUuid,
             @RequestBody CreateChatRequestVo createChatRequestVo) {
         log.info("createChatRequestVo: {}", createChatRequestVo);
         CreateChatRequestDto createChatRequestDto = CreateChatRequestDto.from(createChatRequestVo, memberUuid);
@@ -32,7 +32,7 @@ public class ChatReactiveController {
 
     @PutMapping("/softDelete/{id}")
     public Mono<Void> softDeleteChat(
-            @RequestHeader ("Uuid") String memberUuid,
+            @RequestHeader ("userUuid") String memberUuid,
             @PathVariable String id) {
         log.info("deleteChat: {}", id);
         return chatService.softDeleteChat(id, memberUuid);
@@ -53,10 +53,25 @@ public class ChatReactiveController {
 
     @PostMapping("/join/{mentoringSessionUuid}")
     public Mono<Void> userJoin(
-            @RequestHeader ("Uuid") String memberUuid,
+            @RequestHeader ("userUuid") String memberUuid,
             @RequestParam String nickName,
             @PathVariable String mentoringSessionUuid) {
         return chatService.handleUserJoin(memberUuid, nickName, mentoringSessionUuid);
     }
 
+    @PostMapping("/leave/{mentoringSessionUuid}")
+    public Mono<Void> userLeave(
+            @RequestHeader ("userUuid") String memberUuid,
+            @RequestParam String nickName,
+            @PathVariable String mentoringSessionUuid) {
+        return chatService.handleUserLeave(memberUuid, nickName, mentoringSessionUuid);
+    }
+
+    @PostMapping("/heartbeat/{mentoringSessionUuid}")
+    public Mono<Void> handleHeartbeat(
+            @RequestHeader("userUuid") String memberUuid,
+            @RequestParam String nickName,
+            @PathVariable String mentoringSessionUuid) {
+        return chatService.updateHeartbeat(memberUuid, nickName, mentoringSessionUuid);
+    }
 }

@@ -16,4 +16,6 @@ public interface ChatService {
     List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber);
     Flux<ChatResponseDto> getRealTimeChatByMentoringSessionUuid(String mentoringSessionUuid);
     Mono<Void> handleUserJoin(String memberUuid, String nickName, String mentoringSessionUuid);
+    Mono<Void> handleUserLeave(String memberUuid, String nickName, String mentoringSessionUuid);
+    Mono<Void> updateHeartbeat(String memberUuid, String nickName, String mentoringSessionUuid);
 }
