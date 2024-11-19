@@ -18,4 +18,5 @@ public interface ChatService {
     Mono<Void> handleUserJoin(String memberUuid, String nickName, String mentoringSessionUuid);
     Mono<Void> handleUserLeave(String memberUuid, String nickName, String mentoringSessionUuid);
     Mono<Void> updateHeartbeat(String memberUuid, String nickName, String mentoringSessionUuid);
+    Mono<List<String>> getUsersInMentoringSession(String mentoringSessionUuid);
 }

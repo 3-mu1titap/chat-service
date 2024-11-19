@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.multitap.chat.chat.domain.MessageType.NOTICE;
 import static com.multitap.chat.common.response.BaseResponseStatus.*;
@@ -163,8 +164,25 @@ public class ChatServiceImpl implements ChatService {
         return Mono.empty();
     }
 
+    @Override
+    public Mono<List<String>> getUsersInMentoringSession(String mentoringSessionUuid) {
+        // 레디스에서 해당 멘토링 세션에 참가 중인 유저의 키들을 조회
+        Set<String> keys = redisTemplate.keys("chat:" + mentoringSessionUuid + ":*"); // 특정 mentoringSessionUuid에 해당하는 유저들만 조회
+
+        // 키들이 존재한다면, 유저 리스트를 반환
+        if (keys != null && !keys.isEmpty()) {
+            List<String> users = keys.stream()
+                    .map(key -> key.split(":")[2])  // key를 "chat:mentoringSessionUuid:memberUuid:nickName" 형식으로 사용
+                    .collect(Collectors.toList());
+
+            return Mono.just(users);
+        } else {
+            return Mono.empty();  // 유저가 없으면 빈 리스트 반환
+        }
+    }
+
     private String generateUserKey(String memberUuid, String nickName, String mentoringSessionUuid) {
-        return "chat:" + memberUuid + ":" + mentoringSessionUuid + ":" + nickName;
+        return "chat:" + mentoringSessionUuid + ":" + memberUuid + ":" + nickName;
     }
 
     @Scheduled(fixedRate = 30000) // 30초마다 실행
@@ -189,9 +207,9 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private void handleUserTimeout(String key) {
-        String[] parts = key.split(":"); // 키를 "memberUuid:mentoringSessionUuid:nickName"로 가정
-        String memberUuid = parts[1];
-        String mentoringSessionUuid = parts[2];
+        String[] parts = key.split(":"); // 키를 "chat:mentoringSessionUuid:memberUuid:nickName"로 가정
+        String mentoringSessionUuid = parts[1];
+        String memberUuid = parts[2];
         String nickName = parts[3];
         log.info("유저 타임아웃 발생: {}", memberUuid);
 

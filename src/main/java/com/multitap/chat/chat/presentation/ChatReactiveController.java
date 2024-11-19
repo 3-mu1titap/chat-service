@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -73,5 +75,12 @@ public class ChatReactiveController {
             @RequestParam String nickName,
             @PathVariable String mentoringSessionUuid) {
         return chatService.updateHeartbeat(memberUuid, nickName, mentoringSessionUuid);
+    }
+
+    @GetMapping("/getParticipants/{mentoringSessionUuid}")
+    public Mono<BaseResponse<List<String>>> getUsersInRoom(@PathVariable String mentoringSessionUuid) {
+        return chatService.getUsersInMentoringSession(mentoringSessionUuid)
+                .map(users -> new BaseResponse<>(users))
+                .defaultIfEmpty(new BaseResponse<>(List.of()));
     }
 }
