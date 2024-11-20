@@ -5,6 +5,7 @@ import com.multitap.chat.chat.domain.MessageType;
 import com.multitap.chat.chat.vo.out.ChatResponseVo;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @Slf4j
+@ToString
 public class ChatResponseDto {
 
     private String id;

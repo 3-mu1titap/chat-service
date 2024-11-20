@@ -9,6 +9,7 @@ import com.multitap.chat.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,9 +28,7 @@ import org.bson.Document;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -73,16 +72,28 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber) {
+    public Page<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         LocalDateTime date = (cursorTimestamp != null) ? cursorTimestamp : LocalDateTime.now();
 
+        // 데이터 조회 (limit+1 개로 가져옴)
         return chatRepository.findByMentoringSessionUuidAndCreatedAtLessThan(mentoringSessionUuid, date, pageable)
-                .stream()
-                .map(ChatResponseDto::from)
-                .toList();
+                .map(ChatResponseDto::from);
+
     }
+
+//    @Override
+//    public List<ChatResponseDto> getChatsByMentoringSessionUuid(String mentoringSessionUuid, LocalDateTime cursorTimestamp, int limit, int pageNumber) {
+//        Pageable pageable = PageRequest.of(pageNumber, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+//
+//        LocalDateTime date = (cursorTimestamp != null) ? cursorTimestamp : LocalDateTime.now();
+//
+//        return chatRepository.findByMentoringSessionUuidAndCreatedAtLessThan(mentoringSessionUuid, date, pageable)
+//                .stream()
+//                .map(ChatResponseDto::from)
+//                .toList();
+//    }
 
     @Override
     public Flux<ChatResponseDto> getRealTimeChatByMentoringSessionUuid(String mentoringSessionUuid) {
