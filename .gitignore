@@ -35,14 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
-application.yml
+src/main/resources/application.yml
 
 
 ## mongo data
 ./data
 /data
 
-#src/main/resources/application.yml
 
-**/SwaggerConfig.class
-**/SwaggerConfig.java
+docker-compose.yml

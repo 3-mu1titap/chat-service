@@ -77,7 +77,6 @@ public class ChatServiceImpl implements ChatService {
 
         LocalDateTime date = (cursorTimestamp != null) ? cursorTimestamp : LocalDateTime.now();
 
-        // 데이터 조회 (limit+1 개로 가져옴)
         return chatRepository.findByMentoringSessionUuidAndCreatedAtLessThan(mentoringSessionUuid, date, pageable)
                 .map(ChatResponseDto::from);
 
@@ -161,6 +160,7 @@ public class ChatServiceImpl implements ChatService {
 
         String key = generateUserKey(memberUuid, nickName, mentoringSessionUuid);
         redisTemplate.delete(key); // Redis에서 제거
+        log.info("key 삭제");
 
         return reactiveChatRepository.save(CreateChatRequestDto
                         .of(mentoringSessionUuid, memberUuid, message, NOTICE, null).toChat())
@@ -193,6 +193,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private String generateUserKey(String memberUuid, String nickName, String mentoringSessionUuid) {
+        log.info("memberUuid : {}", memberUuid );
+        log.info("nickName : {}", nickName );
+        log.info("mentoringSessionUuid : {}", mentoringSessionUuid );
+
+        log.info("uuid - chat:" + mentoringSessionUuid + ":" + memberUuid + ":" + nickName);
         return "chat:" + mentoringSessionUuid + ":" + memberUuid + ":" + nickName;
     }
 
@@ -202,6 +207,7 @@ public class ChatServiceImpl implements ChatService {
 //        log.info("checkHeartbeatTimeout : {} ", "안녕하세요.");
         if (keys == null || keys.isEmpty()) return;
         LocalDateTime now = LocalDateTime.now();
+        log.info(keys.toString());
 
         for (String key : keys) {
             String lastHeartbeatStr = redisTemplate.opsForValue().get(key);
