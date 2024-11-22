@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     private static final String BEARER_TOKEN_PREFIX = "Bearer";
+
+    @Value("${swagger.uri}")
+    private String swaggerUri;
 
     @Bean
     public OpenAPI openAPI() {
@@ -28,8 +32,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .addSecurityItem(securityRequirement)
                 .components(components)
-                .addServersItem(new Server().url("/chat-service")) // 배포 버전
-//                .addServersItem(new Server().url("/")) // 로컬 버전
+                .addServersItem(new Server().url(swaggerUri))
                 .info(apiInfo());
     }
 
