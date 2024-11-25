@@ -1,10 +1,13 @@
 package com.multitap.chat.chat.application;
 
+import com.multitap.chat.chat.domain.Chat;
 import com.multitap.chat.chat.domain.MessageType;
 import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import com.multitap.chat.chat.infrastructure.ChatRepository;
 import com.multitap.chat.chat.infrastructure.ReactiveChatRepository;
+import com.multitap.chat.chat.kafka.producer.ChatMessageDto;
+import com.multitap.chat.chat.kafka.producer.KafkaProducerService;
 import com.multitap.chat.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.bson.Document;
@@ -38,22 +42,33 @@ import static com.multitap.chat.common.response.BaseResponseStatus.*;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ChatServiceImpl implements ChatService {
 
     private final ReactiveChatRepository reactiveChatRepository;
     private final ChatRepository chatRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final KafkaProducerService kafkaProducerService;
 
     private final RedisTemplate<String, String> redisTemplate;
     private static final Duration timeoutDuration = Duration.ofSeconds(60); // 60초 타임아웃
 
     @Override
+    @Transactional
     public Mono<Void> createChat(CreateChatRequestDto createChatRequestDto) {
         log.info("Create chat request: {}", createChatRequestDto);
+
+        ChatMessageDto chatMessageDto = ChatMessageDto.from(createChatRequestDto.toChat());
+
+        log.info("Create chat chatMessageDto: {}", chatMessageDto.toString());
+
+        kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
+
         return reactiveChatRepository.save(createChatRequestDto.toChat()).then();
     }
 
     @Override
+    @Transactional
     public Mono<Void> softDeleteChat(String id, String memberUuid) {
         log.info("Delete chat: {}", id);
         return reactiveChatRepository.findChatByIdAndMemberUuid(id, memberUuid)
@@ -141,6 +156,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> handleUserJoin(String memberUuid, String nickName, String mentoringSessionUuid) {
         String message = nickName + "님이 채팅방에 입장하셨습니다.";
 
@@ -155,6 +171,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> handleUserLeave(String memberUuid, String nickName, String mentoringSessionUuid) {
         String message = nickName + "님이 채팅방에서 퇴장하셨습니다.";
 
@@ -168,6 +185,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> updateHeartbeat(String memberUuid, String nickName, String mentoringSessionUuid) {
         String key = generateUserKey(memberUuid, nickName, mentoringSessionUuid);
         String now = LocalDateTime.now().toString(); // 현재 시간을 문자열로 저장
@@ -202,6 +220,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Scheduled(fixedRate = 30000) // 30초마다 실행
+    @Transactional
     public void checkHeartbeatTimeout() {
         Set<String> keys = redisTemplate.keys("chat:*"); // Redis에 저장된 모든 키 조회
 //        log.info("checkHeartbeatTimeout : {} ", "안녕하세요.");
