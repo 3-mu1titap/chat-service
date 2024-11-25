@@ -58,13 +58,26 @@ public class ChatServiceImpl implements ChatService {
     public Mono<Void> createChat(CreateChatRequestDto createChatRequestDto) {
         log.info("Create chat request: {}", createChatRequestDto);
 
-        ChatMessageDto chatMessageDto = ChatMessageDto.from(createChatRequestDto.toChat());
+//        ChatMessageDto chatMessageDto = ChatMessageDto.from(createChatRequestDto.toChat());
+//
+//        log.info("Create chat chatMessageDto: {}", chatMessageDto.toString());
+//
+//        kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
+//
+//        return reactiveChatRepository.save(createChatRequestDto.toChat()).then();
 
-        log.info("Create chat chatMessageDto: {}", chatMessageDto.toString());
+        return reactiveChatRepository.save(createChatRequestDto.toChat())
+                .flatMap(savedChat -> {
+                    // ChatMessageDto 생성
+                    ChatMessageDto chatMessageDto = ChatMessageDto.from(savedChat);
+                    log.info("Create chat chatMessageDto: {}", chatMessageDto.toString());
 
-        kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
+                    // Kafka에 메시지 전송
+                    kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
 
-        return reactiveChatRepository.save(createChatRequestDto.toChat()).then();
+                    // void 반환
+                    return Mono.empty();
+                });
     }
 
     @Override

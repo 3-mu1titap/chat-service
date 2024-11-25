@@ -31,7 +31,7 @@ public class ChatMessageDto {
         return ChatMessageDto.builder()
                 .mentoringSessionUuid(chat.getMentoringSessionUuid())
                 .memberUuid(chat.getMemberUuid())
-                .lastMessageTime(LocalDateTime.now())
+                .lastMessageTime(chat.getCreatedAt())
                 .lastMessage(chat.getMessage())
                 .build();
     }
