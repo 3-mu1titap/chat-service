@@ -5,6 +5,7 @@ import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import com.multitap.chat.chat.vo.out.ChatResponseVo;
 import com.multitap.chat.chat.vo.out.PagedResponseVo;
 import com.multitap.chat.common.response.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    @Operation(summary = "채팅 내역 조회", description = "특정 유저의 특정 채팅방의 채팅 내역을 무한스크롤로 조회합니다.")
     @GetMapping("/pagingSearch/{mentoringSessionUuid}")
     public BaseResponse<PagedResponseVo> getChatsByMentoringSessionUuid(
             @PathVariable String mentoringSessionUuid,
