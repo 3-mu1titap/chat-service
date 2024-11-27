@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.multitap.chat.chat.domain.MessageType.NOTICE;
+import static com.multitap.chat.chat.domain.MessageType.TEXT;
 import static com.multitap.chat.common.response.BaseResponseStatus.*;
 
 @Slf4j
@@ -73,7 +74,9 @@ public class ChatServiceImpl implements ChatService {
                     log.info("Create chat chatMessageDto: {}", chatMessageDto.toString());
 
                     // Kafka에 메시지 전송
-                    kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
+                    if (createChatRequestDto.getMessageType() == TEXT) {
+                        kafkaProducerService.sendCreateChatMessageList(chatMessageDto);
+                    }
 
                     // void 반환
                     return Mono.empty();
