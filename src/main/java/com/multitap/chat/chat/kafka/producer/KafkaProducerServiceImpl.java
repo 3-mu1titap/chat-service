@@ -21,4 +21,14 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void sendChatMember(ChatMemberDto chatMemberDto) {
+        try {
+            kafkaTemplate.send("chat-member-topic", chatMemberDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
 }
