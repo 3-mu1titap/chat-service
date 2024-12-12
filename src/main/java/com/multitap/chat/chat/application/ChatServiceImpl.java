@@ -6,6 +6,7 @@ import com.multitap.chat.chat.dto.in.CreateChatRequestDto;
 import com.multitap.chat.chat.dto.out.ChatResponseDto;
 import com.multitap.chat.chat.infrastructure.ChatRepository;
 import com.multitap.chat.chat.infrastructure.ReactiveChatRepository;
+import com.multitap.chat.chat.kafka.producer.ChatMemberDto;
 import com.multitap.chat.chat.kafka.producer.ChatMessageDto;
 import com.multitap.chat.chat.kafka.producer.KafkaProducerService;
 import com.multitap.chat.common.exception.BaseException;
@@ -175,6 +176,8 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public Mono<Void> handleUserJoin(String memberUuid, String nickName, String mentoringSessionUuid) {
         String message = nickName + "님이 채팅방에 입장하셨습니다.";
+
+        kafkaProducerService.sendChatMember(ChatMemberDto.of(mentoringSessionUuid, memberUuid));
 
         // Redis에 사용자 정보 저장
         String key = generateUserKey(memberUuid, nickName, mentoringSessionUuid);
