@@ -30,6 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.bson.Document;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -138,6 +139,7 @@ public class ChatServiceImpl implements ChatService {
                 .doOnNext(test -> {
                     log.info("test {}", test);
                 })
+                .distinctUntilChanged() // 중복 이벤트 필터링 추가
                 .map(ChangeStreamEvent::getBody)
                 .map(document -> {
                     // Enum 변환
@@ -151,7 +153,7 @@ public class ChatServiceImpl implements ChatService {
                     }
 
                     // isDeleted가 true인 경우 "삭제된 메시지입니다."로 메시지 내용 설정
-                    String message = document.getBoolean("isDeleted") ? "삭제된 메시지입니다." : document.getString("message");
+                    String message = document.getBoolean("isDeleted") ? "삭제된 메시지입니다." : new String(document.getString("message").getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);  // 인코딩 처리 추가
 
                     Date createdAtDate = document.get("created_at", Date.class);
                     LocalDateTime createdAt = createdAtDate != null
